@@ -1,0 +1,14 @@
+{
+  "name": "modelsaber-updater",
+  "version": "1.0.0",
+  "description": "Webhook receiver from github to update ModelSaber",
+  "main": "index.js",
+  "repository": "https://github.com/ModelSaber/ModelSaber.Updater",
+  "author": "wolfcomp",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.7.4"
+  },
+  "type": "commonjs"
+}
