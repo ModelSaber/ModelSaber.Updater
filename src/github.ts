@@ -2,30 +2,22 @@ import { debug, info } from "./log";
 import { ProcessName, processRequest } from "./process";
 
 export function processBody(body: string) {
-    const requestBody = JSON.parse(body) as GitHubRequest;
-    if (requestBody.repository.name.toLowerCase().includes("modelsaber")) {
+    const requestBody = JSON.parse(body) as GitActionBody;
+    if (requestBody.project.includes("modelsaber")) {
 
-        info(`Processing request for project ${getProjectName(requestBody)}`);
-
-        switch (requestBody.action) {
-            case "created":
-            case "released":
-            case "published":
-            case "prereleased":
-                setTimeout(() => getAssetJson(requestBody), 1000);
-                break;
-        }
+        info(`Processing request for project ${getProcessName(requestBody.project.toLowerCase())}`);
+        fetch(`https://api.github.com/repos/ModelSaber/${requestBody.project}/releases/latest`).then(res => res.json()).then((res: GitHubRelease) => {
+            getAssetJson(res);
+        });
     }
 }
 
-function getAssetJson(requestBody: GitHubRequest) {
-    fetch(requestBody.release.assets_url).then(res => res.json() as Promise<Asset[]>).then(assets => {
-        if (assets.length > 0) {
-            info(`Downloading ${assets[0].name} from ${assets[0].browser_download_url}`);
-            const process = getProcessName(getProjectName(requestBody));
-            processRequest(process!, assets[0].browser_download_url);
-        }
-    });
+function getAssetJson(requestBody: GitHubRelease) {
+    if (requestBody.assets.length > 0) {
+        info(`Downloading ${requestBody.assets[0].name} from ${requestBody.assets[0].browser_download_url}`);
+        const process = getProcessName(getProjectName(requestBody));
+        processRequest(process!, requestBody.assets[0].browser_download_url);
+    }
 }
 
 function getProcessName(projectName: string) {
@@ -37,8 +29,9 @@ function getProcessName(projectName: string) {
     }
 }
 
-function getProjectName(requestBody: GitHubRequest) {
-    return requestBody.repository.git_url.split("/").pop()!.split('.git')[0].toLowerCase();
+function getProjectName(requestBody: GitHubRelease) {
+    var strings = requestBody.url.split("/");
+    return strings[strings.indexOf("releases") - 1] as string;
 }
 
 interface User {
@@ -212,4 +205,9 @@ interface GitHubRelease {
     published_at: Date;
     author: User;
     assets: Asset[];
+}
+
+interface GitActionBody {
+    project: string;
+    tag: string;
 }

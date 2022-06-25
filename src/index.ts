@@ -19,8 +19,6 @@ async function recieve(req: IncomingMessage, res: ServerResponse) {
 
     const body = Buffer.concat(buffers).toString();
 
-    debug("Request Body: " + body);
-
     processBody(body);
 
     res.writeHead(200);
