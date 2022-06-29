@@ -3,7 +3,7 @@ import { ProcessName, processRequest } from "./process";
 
 export function processBody(body: string) {
     const requestBody = JSON.parse(body) as GitActionBody;
-    if (requestBody.project.includes("modelsaber")) {
+    if (requestBody.project.toLowerCase().includes("modelsaber")) {
 
         info(`Processing request for project ${getProcessName(requestBody.project.toLowerCase())}`);
         fetch(`https://api.github.com/repos/ModelSaber/${requestBody.project}/releases/latest`).then(res => res.json()).then((res: GitHubRelease) => {
@@ -21,7 +21,7 @@ function getAssetJson(requestBody: GitHubRelease) {
 }
 
 function getProcessName(projectName: string) {
-    switch (projectName) {
+    switch (projectName.toLowerCase()) {
         case "modelsaber.main":
             return ProcessName.Main;
         case "modelsaber.api":

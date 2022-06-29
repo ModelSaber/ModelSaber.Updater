@@ -5,7 +5,7 @@ import { debug } from "./log";
 const port = 6050;
 
 async function recieve(req: IncomingMessage, res: ServerResponse) {
-    if (req.method != "POST") {
+    if (req.method != "PUT") {
         res.writeHead(403, { "Content-Type": "text/plain" });
         res.end("403 Forbidden");
         return;
@@ -18,6 +18,8 @@ async function recieve(req: IncomingMessage, res: ServerResponse) {
     }
 
     const body = Buffer.concat(buffers).toString();
+
+    debug("Request Body: " + body);
 
     processBody(body);
 
